@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#edf2f1" />
+  <title>MUSIS — 925 Silver Jewellery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500;600&family=Prata&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="announcement" aria-live="polite"><span id="announcementText">澳門滿 MOP 300 免運</span></div>
+  <header class="site-header">
+    <button class="icon-button menu-button" aria-label="開啟選單">☰</button>
+    <a href="#home" class="brand brand-logo" aria-label="MUSIS 首頁"><img src="assets/musis-logo-dark.png" alt="MUSIS"></a>
+    <nav class="desktop-nav" aria-label="主要導覽">
+      <a href="#new"><span class="nav-zh">新品</span><span class="nav-en">NEW ARRIVALS</span></a><a href="#hot"><span class="nav-zh">熱銷</span><span class="nav-en">BEST</span></a><a href="#shop?cat=crystal"><span class="nav-zh">水晶</span><span class="nav-en">CRYSTAL</span></a><a href="#shop?cat=earrings"><span class="nav-zh">耳環</span><span class="nav-en">EARRINGS</span></a><a href="#shop?cat=rings"><span class="nav-zh">戒指</span><span class="nav-en">RINGS</span></a><a href="#shop?cat=necklaces"><span class="nav-zh">頸鏈</span><span class="nav-en">NECKLACES</span></a><a href="#shop?cat=bracelets"><span class="nav-zh">手鏈</span><span class="nav-en">BRACELETS</span></a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-button header-action" id="cartButton" aria-label="開啟購物清單" aria-expanded="false" aria-controls="cartDrawer"><span class="header-icon-with-count"><svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l1 13H4L5 8Z"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/></svg><span id="cartCount">0</span></span><span class="header-action-label">BAG</span></button>
+      <a class="text-button favorites-link header-action" href="#favorites" aria-label="查看收藏"><span class="header-icon-with-count"><svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.2 3.5 12.5C.8 9.7 1.3 5.3 4.4 3.2c2.5-1.7 5.8-1.1 7.6 1.3 1.8-2.4 5.1-3 7.6-1.3 3.1 2.1 3.6 6.5.9 9.3L12 21.2Z"/></svg><span id="favoritesCount">0</span></span><span class="header-action-label">WISHLIST</span></a>
+      <a class="text-button order-lookup-link" href="#order">查詢訂單</a>
+    </div>
+  </header>
+
+  <aside class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+    <button class="drawer-close" aria-label="關閉選單">×</button>
+    <a href="#new">新品</a><a href="#hot">熱銷</a><a href="#shop?cat=crystal">水晶系列</a><a href="#shop?cat=earrings">耳環</a><a href="#shop?cat=rings">戒指</a><a href="#shop?cat=necklaces">頸鏈</a><a href="#shop?cat=bracelets">手鏈</a><a href="#favorites">我的收藏</a><a href="#order">查詢訂單</a>
+  </aside>
+
+  <main id="app"></main>
+
+  <aside class="cart-drawer" id="cartDrawer" aria-hidden="true">
+    <div class="drawer-head"><p>購物清單</p><button class="drawer-close" id="cartClose" aria-label="關閉購物清單">×</button></div>
+    <div id="cartItems" class="cart-items"></div>
+    <div class="cart-summary">
+      <div class="shipping-progress"><div id="shippingBar"></div></div>
+      <p id="shippingMessage" class="micro"></p>
+      <div class="total-line"><span>小計</span><strong id="cartSubtotal">MOP 0</strong></div>
+      <button class="primary full" id="checkoutButton">前往結帳</button>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <template id="homeTemplate">
+    <section class="hero">
+      <div class="hero-copy reveal">
+        <h1>Silver,<br><em>kept close.</em></h1>
+        <p class="hero-text">日常佩戴的純銀飾品。輕盈、細緻，留住每個靠近你的時刻。</p>
+        <a class="primary" href="#shop">探索系列 <span>↗</span></a>
+      </div>
+      <div class="hero-image" role="region" aria-label="MUSIS 首頁圖片輪播">
+        <div class="hero-slide active" style="background-image:url('assets/musis-hero.png')" aria-label="MUSIS 純銀飾品靜物"></div>
+        <div class="hero-slide" style="background-image:url('assets/musis-hero-2.jpg')" aria-label="MUSIS 純銀飾品近景"></div>
+        <div class="hero-slide" style="background-image:url('assets/musis-hero-3.jpg')" aria-label="MUSIS 純銀飾品細節"></div>
+        <button class="hero-arrow prev" aria-label="上一張">←</button><button class="hero-arrow next" aria-label="下一張">→</button>
+        <div class="hero-dots"><button class="active" aria-label="第 1 張"></button><button aria-label="第 2 張"></button><button aria-label="第 3 張"></button></div>
+      </div>
+      <svg class="silver-thread" viewBox="0 0 1200 220" preserveAspectRatio="none" aria-hidden="true"><path d="M-20 175 C150 20 310 210 485 92 S820 5 1240 152"/></svg>
+    </section>
+    <section class="featured-section">
+      <div class="section-heading reveal"><div><p class="eyebrow">NEW ARRIVALS</p><h2>新品上線</h2></div><a href="#new">查看全部 →</a></div>
+      <div class="product-grid" id="featuredGrid"></div>
+    </section>
+    <section class="bestseller-section reveal">
+      <div class="section-heading"><div><p class="eyebrow">BEST</p><h2>熱銷商品</h2></div><a href="#hot">查看全部 →</a></div>
+      <div class="product-grid" id="bestsellerGrid"></div>
+    </section>
+  </template>
+
+  <template id="shopTemplate">
+    <section class="shop-head collection-head" id="shopHeading"></section>
+    <section class="shop-controls"><div class="filters" id="filters"></div><div class="shop-tools"><label class="sort-control"><span>排序</span><select id="sortSelect"><option value="newest">最新上架</option><option value="price-asc">價格由低至高</option><option value="price-desc">價格由高至低</option></select></label><label class="search"><svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg><span>搜尋</span><input id="searchInput" placeholder="輸入商品名稱" /></label></div></section>
+    <section class="catalog product-grid" id="catalogGrid"></section><nav class="pagination" id="catalogPagination" aria-label="商品分頁"></nav>
+  </template>
+
+  <template id="checkoutTemplate">
+    <section class="checkout-shell">
+      <div class="checkout-main"><nav class="checkout-progress" aria-label="結帳進度"><span class="done"><i>1</i>購物清單</span><span class="active" aria-current="step"><i>2</i>確認訂單</span><span><i>3</i>下單成功</span></nav><p class="eyebrow">SECURE CHECKOUT · DEMO</p><h1>確認訂單</h1><div class="demo-notice">原型模式：不會建立真實訂單或進行付款。</div>
+        <form id="checkoutForm">
+          <fieldset><legend>配送地區</legend><div class="option-cards region-options"><label class="option-card selected"><input type="radio" name="region" value="macau" checked><span><strong>澳門</strong><small>滿 MOP 300 免運</small></span></label><label class="option-card"><input type="radio" name="region" value="hongkong"><span><strong>香港</strong><small>滿 MOP 500 順豐寄付</small></span></label></div></fieldset>
+          <fieldset><legend>訂購人資訊</legend><div class="field-grid"><label><span>姓名 <em class="required-mark">*</em></span><input id="orderName" name="name" required placeholder="姓名"></label><label id="phoneField"><span id="phoneLabel">手機號碼（+853） <em class="required-mark">*</em></span><input id="checkoutPhone" name="phone" required inputmode="numeric" autocomplete="tel-national" pattern="[0-9 ]{8,9}" maxlength="9" placeholder="例如：6688 1234"></label><label><span>Email <em class="required-mark">*</em></span><input name="email" type="email" required placeholder="name@example.com"></label><label><span>Instagram <em class="required-mark">*</em></span><input name="instagram" required placeholder="用戶名稱"></label></div></fieldset>
+          <fieldset><legend>收貨方式</legend><div class="option-cards" id="deliveryOptions"></div><div class="recipient-row"><label><span>收件人姓名 <em class="required-mark">*</em></span><input id="recipientName" name="recipientName" required placeholder="收件人姓名"></label><label class="same-name"><input id="sameName" type="checkbox">與訂購人姓名一致</label></div><label id="pickupField"><span id="pickupLabel">取貨點／智能櫃名稱 <em class="required-mark">*</em></span><input name="pickup" required placeholder="例如：筷子基 eBuy 取貨點"></label></fieldset>
+          <fieldset><legend>付款方式</legend><div class="option-cards"><label class="option-card payment-option selected"><input type="radio" name="payment" value="boc" checked><img class="payment-logo payment-logo-boc" src="assets/payment/boc-symbol.svg" alt="中國銀行標誌"><span><strong>澳門中銀轉帳</strong><small>下單後顯示帳戶資料</small></span></label><label class="option-card payment-option disabled"><input type="radio" name="payment" disabled><i class="payment-logo payment-logo-mpay" role="img" aria-label="MPay 橙色標誌"></i><span><strong>MPay 掃碼付款</strong><small>申請中 · 即將開放</small></span></label></div></fieldset>
+          <fieldset class="promo-fieldset"><legend>優惠碼</legend><div class="promo-entry"><input id="promoInput" autocomplete="off" placeholder="輸入優惠碼"><button type="button" id="applyPromo">套用</button></div><p class="promo-feedback" id="promoFeedback" role="status"></p></fieldset>
+          <label class="terms"><input type="checkbox" required> 我已閱讀<a href="#guide">購買須知</a>及<a href="#shipping">運送服務</a></label>
+          <button class="primary full" type="submit">建立示範訂單</button>
+        </form>
+      </div>
+      <aside class="order-review"><p class="eyebrow">ORDER SUMMARY</p><p class="review-section-label">商品資訊</p><div id="reviewItems"></div><div class="summary-lines"><p><span>商品總價</span><b id="reviewSubtotal"></b></p><p id="reviewDiscountRow" hidden><span>優惠折扣</span><b id="reviewDiscount"></b></p><p><span>運費</span><b id="reviewShipping"></b></p><p class="grand-total"><span>總計</span><b id="reviewTotal"></b></p></div></aside>
+    </section>
+  </template>
+
+  <template id="adminTemplate">
+    <section class="admin-shell">
+      <aside class="admin-nav"><a class="brand admin-brand" href="#home"><img src="assets/musis-logo-light.png" alt="MUSIS"><span>ADMIN</span></a><nav><button class="active">總覽</button><button>商品</button><button>訂單 <i>3</i></button><button>折扣活動</button><button>庫存</button><button>顧客</button><button>網站內容</button></nav><a href="#home" class="back-store">← 返回商店</a></aside>
+      <div class="admin-main"><header><div><p class="eyebrow">2 OCT 2026 · MACAU</p><h1>下午好，MUSIS</h1></div><button class="primary" id="newProduct">＋ 新增商品</button></header>
+        <div class="metric-grid"><article><span>今日訂單</span><strong>8</strong><small>較昨日 +3</small></article><article><span>待核款</span><strong>3</strong><small>需要處理</small></article><article><span>低庫存</span><strong>6</strong><small>剩餘 2 件以下</small></article><article><span>本月銷售</span><strong>MOP 12,480</strong><small>示範數據</small></article></div>
+        <section class="admin-panel"><div class="panel-head"><div><p class="eyebrow">PAYMENT QUEUE</p><h2>待人工核款</h2></div><button class="text-button">查看全部 →</button></div><div class="order-table" id="adminOrders"></div></section>
+        <section class="admin-panel"><div class="panel-head"><div><p class="eyebrow">PRODUCTS</p><h2>商品快速管理</h2></div><label class="search admin-search"><span>搜尋</span><input placeholder="SKU / 商品名稱"></label></div><div class="product-table" id="adminProducts"></div></section>
+        <section class="admin-panel ring-size-admin"><div class="panel-head"><div><p class="eyebrow">RING SIZES</p><h2>戒指尺寸設定</h2></div><button class="primary" id="saveRingSizes" type="button">儲存尺寸</button></div><div class="ring-size-admin-grid" id="ringSizeAdmin"></div><p class="discount-note">每款戒指預設為「均碼・開口戒」；如需碼數選擇，請以頓號分隔，例如：10、12、14。</p></section>
+        <section class="admin-panel discount-admin"><div class="panel-head"><div><p class="eyebrow">DISCOUNTS</p><h2>折扣活動</h2></div><label class="discount-switch"><input id="discountEnabled" type="checkbox"><span>啟用活動</span></label></div><div class="discount-form"><label>指定商品<select id="discountProduct"></select></label><label>商品優惠價<input id="discountSalePrice" type="number" min="1"></label><label>優惠碼<input id="discountCode" autocomplete="off"></label><label>折扣百分比<input id="discountPercent" type="number" min="1" max="99"></label><label>最低消費<input id="discountMinimum" type="number" min="0"></label><label>開始日期<input id="discountStart" type="date"></label><label>結束日期<input id="discountEnd" type="date"></label><button class="primary" id="saveDiscount" type="button">儲存折扣設定</button></div><p class="discount-note">商品優惠價會直接顯示在商品頁；優惠碼在結帳時由客戶輸入。</p></section>
+        <section class="admin-panel announcement-admin"><div class="panel-head"><div><p class="eyebrow">ANNOUNCEMENT</p><h2>頂部公告輪播</h2></div><button class="primary" id="saveAnnouncements" type="button">儲存公告</button></div><div class="announcement-form"><label>公告 1<input id="announcement1"></label><label>公告 2<input id="announcement2"></label><label>公告 3（優惠活動同步）<input id="announcement3"></label></div><p class="discount-note">前台每 4 秒輪播一則；空白公告不會顯示。</p></section>
+        <section class="admin-panel about-admin"><div class="panel-head"><div><p class="eyebrow">ABOUT PAGE</p><h2>關於 MUSIS 頁面</h2></div><button class="primary" id="saveAbout" type="button">儲存頁面</button></div><div class="about-admin-form"><label>主標題<input id="aboutTitle"></label><label>品牌介紹<textarea id="aboutBody" rows="4"></textarea></label><label>保養標題<input id="aboutCareTitle"></label><label>保養內容<textarea id="aboutCareBody" rows="3"></textarea></label><label>背景圖片<input id="aboutImage" type="file" accept="image/*"><small>建議使用橫向圖片；未選擇會保留目前圖片。</small></label></div></section>
+      </div>
+    </section>
+  </template>
+
+  <template id="orderTemplate">
+    <section class="order-lookup reveal">
+      <div class="order-lookup-intro"><p class="eyebrow">ORDER STATUS</p><h1>查詢訂單進度</h1><p>輸入下單時使用的電話號碼與訂單編號，即可查看付款、備貨及配送狀態。</p><div class="order-number-tip"><strong>如何找到訂單編號？</strong><span>完成下單後，可在訂單完成頁面及系統自動寄出的確認 Email 中找到，例如：MS260928。</span></div></div>
+      <div class="order-lookup-card">
+        <form id="orderLookupForm" novalidate>
+          <label>電話號碼<input id="lookupPhone" inputmode="tel" autocomplete="tel" placeholder="例如：6688 1234" required></label>
+          <label>訂單編號<input id="lookupNumber" autocomplete="off" placeholder="例如：MS260928" required></label>
+          <button class="primary full" type="submit">查詢訂單進度 <span>→</span></button>
+          <p class="lookup-demo">原型測試：電話 <b>6688 1234</b>　訂單 <b>MS260928</b></p>
+          <p class="lookup-error" id="lookupError" role="alert"></p>
+        </form>
+        <div id="orderLookupResult" class="order-result" hidden></div>
+      </div>
+    </section>
+  </template>
+
+  <footer><div class="footer-brand"><img src="assets/musis-logo-light.png" alt="MUSIS"></div><div><a href="#about">關於 MUSIS</a><a href="#order">查詢訂單</a><a href="#guide">購買須知</a><a href="#care">保養建議</a><a href="#shipping">運送服務</a></div><div><a href="https://www.instagram.com/musis.studio/" target="_blank" rel="noreferrer">Instagram ↗</a><p>這是第一期互動原型<br>付款及訂單均為示範資料</p></div></footer>
+  <script src="app.js"></script>
+</body>
+</html>
