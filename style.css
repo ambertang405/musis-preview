@@ -706,7 +706,7 @@ footer a:hover::after,footer a:active::after,footer a:focus-visible::after{trans
 
 .payment-reminder{max-width:520px;margin:22px 0 0;padding:14px 16px;border-left:3px solid var(--ink);background:var(--mist);font-size:12px;line-height:1.7}
 
-.payment-proof-panel{grid-area:proof;border-top:1px solid var(--line);padding-top:24px}
+.payment-proof-panel{grid-area:proof;padding-top:8px}
 .payment-proof-panel h2{font:clamp(26px,3vw,38px)/1.15 var(--serif);font-weight:500;margin:0 0 12px}
 .payment-proof-panel>p:not(.eyebrow){max-width:560px;margin:0 0 26px;color:var(--muted);font-size:12px;line-height:1.7}
 .payment-proof{max-width:620px;margin:0 0 18px}
@@ -755,7 +755,7 @@ footer a:hover::after,footer a:active::after,footer a:focus-visible::after{trans
 
 @media(max-width:800px){.payment-demo-page{padding:55px 5vw 80px}
 .payment-demo-grid{grid-template-columns:1fr;grid-template-areas:"intro" "bank" "proof";row-gap:32px}
-.payment-proof-panel{padding-top:30px}
+.payment-proof-panel{padding-top:0}
 .payment-proof-preview{grid-template-columns:1fr}
 .payment-proof-preview img{max-height:55vh}
 .demo-qr-card{justify-self:start}
