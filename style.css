@@ -85,6 +85,8 @@ to{stroke-dashoffset:0}
 .qty button{border:1px solid var(--line);background:none;width:24px;height:24px}
 .qty button:disabled{opacity:.3;cursor:not-allowed}
 .cart-limit{display:block;margin-top:7px}
+.order-item-status{display:inline-block;width:max-content;margin:5px 0 2px;padding:3px 6px;background:var(--ink);color:var(--paper);font:8px var(--mono);font-style:normal;letter-spacing:.06em}
+.preorder-order-note{margin:0 0 14px;padding:11px 12px;border-left:3px solid var(--ink);background:var(--mist);font-size:10px;line-height:1.65}
 .remove{border:0;background:none;color:var(--muted);cursor:pointer}
 .cart-summary{padding:24px 28px;border-top:1px solid var(--line)}
 .shipping-progress{height:2px;background:var(--line)}
@@ -116,6 +118,7 @@ label>input:not([type=radio]):not([type=checkbox]){background:transparent;border
 .order-review{background:#e9efed;padding:72px 5vw}
 .review-row{display:grid;grid-template-columns:55px 1fr auto;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);font-size:11px}
 .review-thumb{height:65px}
+.review-row .order-item-status{display:block;margin-bottom:5px}
 .summary-lines{margin-top:28px}
 .summary-lines p{display:flex;justify-content:space-between;font-size:12px}
 .grand-total{font-size:18px!important;border-top:1px solid var(--ink);padding-top:20px}
