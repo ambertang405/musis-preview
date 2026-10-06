@@ -21,9 +21,15 @@ const defaultRingSizes={R0049:['均碼・開口戒'],R0012:['均碼・開口戒'
 let ringSizeSettings={...defaultRingSizes,...JSON.parse(localStorage.getItem('musis-ring-sizes')||'{}')};
 let cart=JSON.parse(localStorage.getItem('musis-cart')||'[]');
 let favorites=JSON.parse(localStorage.getItem('musis-favorites')||'[]');
-let heroCarouselTimer,announcementTimer,checkoutCartSync=null;
+let heroCarouselTimer,announcementTimer,checkoutCartSync=null,checkoutSubmitting=false;
+const checkoutDraftKey='musis-checkout-draft';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 function money(n){return `MOP ${n.toLocaleString('en-US')}`}
+function normalizePhone(value){return value.replace(/\D/g,'')}
+function normalizeInstagram(value){return value.trim().replace(/^@+/,'')}
+function validPersonName(value){const name=value.trim();return name.length>=2&&/\p{L}/u.test(name)}
+function validInstagram(value){const username=normalizeInstagram(value);return /^(?!.*\.\.)[A-Za-z0-9._]{1,30}$/.test(username)&&!username.includes('instagram.com')}
+function readCheckoutDraft(){try{return JSON.parse(localStorage.getItem(checkoutDraftKey)||'null')||{}}catch(error){localStorage.removeItem(checkoutDraftKey);return {}}}
 function discountActive(){const today=new Date().toISOString().slice(0,10);return discountSettings.enabled&&today>=discountSettings.start&&today<=discountSettings.end}
 function productPrice(p){return discountActive()&&p.id===discountSettings.productId?Number(discountSettings.salePrice):p.price}
 function startAnnouncementCarousel(){clearInterval(announcementTimer);const node=$('#announcementText'),items=announcements.filter(Boolean);if(!node||!items.length)return;let index=0;const show=()=>{node.classList.add('changing');setTimeout(()=>{node.textContent=items[index];node.classList.remove('changing');index=(index+1)%items.length},180)};node.textContent=items[0];index=items.length>1?1:0;if(items.length>1)announcementTimer=setInterval(show,4000)}
@@ -128,34 +134,55 @@ function renderProduct(){
 function renderCheckout(){
   closeDrawers();const node=$('#checkoutTemplate').content.cloneNode(true);$('#app').replaceChildren(node);showChrome(true);
   if(!cart.length){location.hash='shop';return}
+  checkoutSubmitting=false;
+  const form=$('#checkoutForm'),savedDraft=readCheckoutDraft();
+  const saveDraft=()=>{const region=$('input[name="region"]:checked')?.value||'macau',delivery=$('input[name="delivery"]:checked')?.value||'';localStorage.setItem(checkoutDraftKey,JSON.stringify({region,delivery,name:$('#orderName').value,phone:$('#checkoutPhone').value,email:$('#orderEmail').value,instagram:$('#orderInstagram').value,recipientName:$('#recipientName').value,sameName:$('#sameName').checked,pickup:$('#pickupInput').value}))};
   let sub=cartSubtotal(),promoDiscount=0;
   const renderReviewItems=()=>{sub=cartSubtotal();const hasPreorder=cart.some(item=>products.find(p=>p.id===item.id)?.preorder),notice=hasPreorder?'<p class="preorder-order-note">訂單包含預訂商品，預設待商品齊全後一併寄出。</p>':'';$('#reviewItems').innerHTML=cart.length?notice+cart.map(x=>{const p=products.find(v=>v.id===x.id);return `<div class="review-row"><div class="review-thumb image-loading">${productImageMarkup(p,0,'')}</div><span>${p.preorder?'<i class="order-item-status">預訂商品</i>':''}${p.name}<br><small>${p.id}${x.size?` · ${x.size}`:''} × ${x.qty}</small></span><b>${money(productPrice(p)*x.qty)}</b></div>`}).join(''):'<div class="empty checkout-empty">購物清單已清空<br><small>請先加入商品再完成訂單。</small></div>';bindProductImages($('#reviewItems'));$('#reviewSubtotal').textContent=money(sub)};
   renderReviewItems();
   const selectCards=()=>{$$('.option-card').forEach(x=>x.classList.toggle('selected',!!x.querySelector('input:checked')))};
   const updateDelivery=()=>{
-    const region=$('input[name="region"]:checked').value,isHK=region==='hongkong',discountedSub=Math.max(0,sub-promoDiscount);
+    const currentDelivery=$('input[name="delivery"]:checked')?.value||savedDraft.delivery||'',region=$('input[name="region"]:checked').value,isHK=region==='hongkong',discountedSub=Math.max(0,sub-promoDiscount);
     if(isHK){
       const free=discountedSub>=500;
       $('#phoneLabel').innerHTML='手機號碼（+852） <em class="required-mark">*</em>';$('#checkoutPhone').placeholder='例如：9123 4567';
       $('#deliveryOptions').innerHTML=`<label class="option-card selected"><input type="radio" name="delivery" value="sf" checked><span><strong>${free?'順豐寄付':'順豐到付'}</strong><small>${free?'已達 MOP 500 包郵條件':'運費由收件人支付'}</small></span><b>${free?'免運':'到付'}</b></label>`;
-      $('#pickupLabel').innerHTML='順豐站／智能櫃／地址 <em class="required-mark">*</em>';$('#pickupField input').placeholder='輸入順豐網點名稱或香港收貨地址';
+      $('#pickupLabel').innerHTML='收件地址 <em class="required-mark">*</em>';$('#pickupInput').placeholder='請輸入完整地址。';$('#pickupHelp').textContent='';
       $('#reviewShipping').textContent=free?'免運 · 順豐寄付':'順豐到付';$('#reviewTotal').textContent=money(discountedSub);
     }else{
       const fee=discountedSub>=300?0:25;
       $('#phoneLabel').innerHTML='手機號碼（+853） <em class="required-mark">*</em>';$('#checkoutPhone').placeholder='例如：6688 1234';
       $('#deliveryOptions').innerHTML=`<label class="option-card selected"><input type="radio" name="delivery" value="ebuy" checked><span><strong>eBuy 取貨點</strong><small>滿 MOP 300 免運</small></span><b>${fee?money(fee):'免運'}</b></label><label class="option-card"><input type="radio" name="delivery" value="locker"><span><strong>智能櫃</strong><small>澳門地區</small></span><b>${fee?money(fee):'免運'}</b></label>`;
-      $('#pickupLabel').innerHTML='取貨點／智能櫃名稱 <em class="required-mark">*</em>';$('#pickupField input').placeholder='例如：筷子基 eBuy 取貨點';
+      $('#pickupLabel').innerHTML='取貨點名稱 <em class="required-mark">*</em>';$('#pickupInput').placeholder='例如：筷子基 eBuy 取貨點';$('#pickupHelp').innerHTML='請先<a href="https://m.ebuy.mo/pickup/center" target="_blank" rel="noreferrer">查看 eBuy 最新站點</a>，再輸入取貨點名稱。';
       $('#reviewShipping').textContent=fee?money(fee):'免運';$('#reviewTotal').textContent=money(discountedSub+fee);
     }
-    $$('#deliveryOptions input').forEach(r=>r.onchange=selectCards);selectCards();
+    const retainedDelivery=$$('input[name="delivery"]').find(input=>input.value===currentDelivery);if(retainedDelivery)retainedDelivery.checked=true;$$('#deliveryOptions input').forEach(r=>r.onchange=()=>{selectCards();saveDraft()});selectCards();
   };
-  $$('input[name="region"]').forEach(r=>r.onchange=updateDelivery);updateDelivery();
-  checkoutCartSync=()=>{renderReviewItems();const submit=$('#checkoutForm button[type="submit"]'),feedback=$('#promoFeedback');if(!cart.length){promoDiscount=0;$('#reviewDiscountRow').hidden=true;$('#reviewShipping').textContent='—';$('#reviewTotal').textContent=money(0);if(submit)submit.disabled=true;if(feedback){feedback.textContent='購物清單已清空，請先加入商品。';feedback.className='promo-feedback error'}return}if(submit)submit.disabled=false;if(promoDiscount>0){if(discountActive()&&sub>=discountSettings.minSpend){promoDiscount=Math.round(sub*discountSettings.codePercent/100);$('#reviewDiscount').textContent=`− ${money(promoDiscount)}`;$('#reviewDiscountRow').hidden=false}else{promoDiscount=0;const button=$('#applyPromo');if(button){button.classList.remove('applied');button.classList.add('invalid');button.textContent='套用'}$('#reviewDiscountRow').hidden=true;if(feedback){feedback.textContent='購物清單已更新，請重新套用優惠碼。';feedback.className='promo-feedback error'}}}updateDelivery()};
-  const syncRecipient=()=>{if($('#sameName').checked)$('#recipientName').value=$('#orderName').value};$('#sameName').onchange=()=>{$('#recipientName').readOnly=$('#sameName').checked;syncRecipient();if(!$('#sameName').checked)$('#recipientName').focus()};$('#orderName').oninput=syncRecipient;
+  const savedRegion=$$('input[name="region"]').find(input=>input.value===savedDraft.region);if(savedRegion)savedRegion.checked=true;
+  $$('input[name="region"]').forEach(r=>r.onchange=()=>{updateDelivery();$('#checkoutPhoneError').textContent='';$('#pickupError').textContent='';saveDraft()});updateDelivery();
+  [['#orderName','name'],['#checkoutPhone','phone'],['#orderEmail','email'],['#orderInstagram','instagram'],['#recipientName','recipientName'],['#pickupInput','pickup']].forEach(([selector,key])=>{if(typeof savedDraft[key]==='string')$(selector).value=savedDraft[key]});
+  $('#sameName').checked=!!savedDraft.sameName;const savedDelivery=$$('input[name="delivery"]').find(input=>input.value===savedDraft.delivery);if(savedDelivery)savedDelivery.checked=true;selectCards();
+  checkoutCartSync=()=>{renderReviewItems();const submit=$('#checkoutForm button[type="submit"]'),feedback=$('#promoFeedback');if(!cart.length){promoDiscount=0;$('#reviewDiscountRow').hidden=true;$('#reviewShipping').textContent='—';$('#reviewTotal').textContent=money(0);if(submit)submit.disabled=true;if(feedback){feedback.textContent='購物清單已清空，請先加入商品。';feedback.className='promo-feedback error'}return}if(submit&&!checkoutSubmitting)submit.disabled=false;if(promoDiscount>0){if(discountActive()&&sub>=discountSettings.minSpend){promoDiscount=Math.round(sub*discountSettings.codePercent/100);$('#reviewDiscount').textContent=`− ${money(promoDiscount)}`;$('#reviewDiscountRow').hidden=false}else{promoDiscount=0;const button=$('#applyPromo');if(button){button.classList.remove('applied');button.classList.add('invalid');button.textContent='套用'}$('#reviewDiscountRow').hidden=true;if(feedback){feedback.textContent='購物清單已更新，請重新套用優惠碼。';feedback.className='promo-feedback error'}}}updateDelivery()};
+  const setFieldError=(input,errorId,message='')=>{input.setCustomValidity(message);$(`#${errorId}`).textContent=message;input.classList.toggle('field-invalid',!!message);return !message};
+  const validateNameField=(input,errorId)=>setFieldError(input,errorId,validPersonName(input.value)?'':'請輸入至少 2 個字元，並包含姓名文字。');
+  const validatePhone=()=>setFieldError($('#checkoutPhone'),'checkoutPhoneError',normalizePhone($('#checkoutPhone').value).length===8?'':'請輸入 8 位電話號碼，此號碼只用於訂單聯絡及查詢。');
+  const validateEmail=()=>{const input=$('#orderEmail');input.value=input.value.trim();return setFieldError(input,'orderEmailError',input.validity.valid&&input.value?'':'請輸入有效的 Email 地址。')};
+  const validateInstagramField=()=>{const input=$('#orderInstagram');input.value=normalizeInstagram(input.value);return setFieldError(input,'orderInstagramError',validInstagram(input.value)?'':'請輸入正確的 Instagram 用戶名稱，不要輸入網址或空格。')};
+  const validatePickup=()=>{const input=$('#pickupInput'),isHK=$('input[name="region"]:checked').value==='hongkong',minimum=isHK?6:2;input.value=input.value.trim();return setFieldError(input,'pickupError',input.value.length>=minimum?'':isHK?'請輸入完整收件地址。':'請輸入 eBuy 取貨點或智能櫃名稱。')};
+  const validateCheckout=()=>{const checks=[validateNameField($('#orderName'),'orderNameError'),validatePhone(),validateEmail(),validateInstagramField(),validateNameField($('#recipientName'),'recipientNameError'),validatePickup()];return checks.every(Boolean)};
+  const syncRecipient=()=>{if($('#sameName').checked){$('#recipientName').value=$('#orderName').value;setFieldError($('#recipientName'),'recipientNameError')}};
+  $('#sameName').onchange=()=>{$('#recipientName').readOnly=$('#sameName').checked;syncRecipient();saveDraft();if(!$('#sameName').checked)$('#recipientName').focus()};
+  $('#orderName').oninput=()=>{syncRecipient();saveDraft()};
+  [['#orderName',input=>validateNameField(input,'orderNameError')],['#checkoutPhone',validatePhone],['#orderEmail',validateEmail],['#orderInstagram',validateInstagramField],['#recipientName',input=>validateNameField(input,'recipientNameError')],['#pickupInput',validatePickup]].forEach(([selector,validate])=>{const input=$(selector);input.addEventListener('input',()=>{input.setCustomValidity('');input.classList.remove('field-invalid');const error=input.getAttribute('aria-describedby')?.split(' ').map(id=>document.getElementById(id)).find(node=>node?.classList.contains('field-error'));if(error)error.textContent='';saveDraft()});input.addEventListener('blur',()=>{validate(input);saveDraft()})});
+  $('#recipientName').readOnly=$('#sameName').checked;syncRecipient();
   $('#applyPromo').onclick=()=>{const button=$('#applyPromo'),code=$('#promoInput').value.trim().toUpperCase(),feedback=$('#promoFeedback');button.classList.remove('applied','invalid');button.textContent='套用';if(!discountActive()||code!==discountSettings.code.toUpperCase()){promoDiscount=0;button.classList.add('invalid');feedback.textContent='優惠碼無效或活動尚未開始。';feedback.className='promo-feedback error';$('#reviewDiscountRow').hidden=true;updateDelivery();return}if(sub<discountSettings.minSpend){promoDiscount=0;button.classList.add('invalid');feedback.textContent=`此優惠碼需消費滿 ${money(discountSettings.minSpend)}。`;feedback.className='promo-feedback error';$('#reviewDiscountRow').hidden=true;updateDelivery();return}promoDiscount=Math.round(sub*discountSettings.codePercent/100);button.classList.add('applied');button.textContent='已套用';feedback.textContent=`已套用 ${discountSettings.codePercent}% 優惠。`;feedback.className='promo-feedback success';$('#reviewDiscount').textContent=`− ${money(promoDiscount)}`;$('#reviewDiscountRow').hidden=false;updateDelivery()};
   $$('.terms a').forEach(link=>link.onclick=e=>{e.preventDefault();e.stopPropagation();location.hash=link.getAttribute('href')});
   $('#checkoutForm').onsubmit=e=>{
     e.preventDefault();
+    if(checkoutSubmitting)return;
+    $('#orderName').value=$('#orderName').value.trim();$('#recipientName').value=$('#recipientName').value.trim();$('#checkoutPhone').value=normalizePhone($('#checkoutPhone').value);$('#orderInstagram').value=normalizeInstagram($('#orderInstagram').value);
+    if(!validateCheckout()){const firstInvalid=e.currentTarget.querySelector('.field-invalid');if(firstInvalid)firstInvalid.focus();e.currentTarget.reportValidity();return}
+    checkoutSubmitting=true;const submit=$('#checkoutSubmit');submit.disabled=true;submit.textContent='正在建立訂單…';saveDraft();
     const checkoutState=[...e.currentTarget.elements].filter(el=>el.name||el.id).map(el=>({name:el.name,id:el.id,type:el.type,value:el.value,checked:el.checked}));
     const order=`MS${String(Date.now()).slice(-6)}`,total=$('#reviewTotal').textContent;
     const orderedItems=cart.map((item,index)=>({item,product:products.find(product=>product.id===item.id),index})).filter(row=>row.product);
@@ -169,11 +196,13 @@ function renderCheckout(){
     $('#removePaymentProof').onclick=()=>{resetProof();proofError.textContent='';proof.focus()};
     proofPreview.onload=()=>{if(proofPreviewUrl)complete.disabled=false};proofPreview.onerror=()=>{resetProof();proofError.textContent='無法讀取這張圖片，請重新選擇付款憑證。'};
     proof.onchange=()=>{const file=proof.files[0],allowedTypes=['image/jpeg','image/png','image/webp'];proofError.textContent='';resetProof(false);if(!file)return;if(!allowedTypes.includes(file.type)){proof.value='';proofError.textContent='只接受 JPG、PNG 或 WEBP 圖片。';return}if(file.size>8*1024*1024){proof.value='';proofError.textContent='圖片不可超過 8MB，請壓縮後重新選擇。';return}proofPreviewUrl=URL.createObjectURL(file);proofPreview.src=proofPreviewUrl;proofPreviewBox.hidden=false;proofName.textContent=file.name;proofPreviewName.textContent=file.name};
-    complete.onclick=()=>{
+    let paymentCompleting=false;complete.onclick=()=>{
+      if(paymentCompleting)return;
       if(!proof.files.length){proofError.textContent='請先上傳付款憑證截圖。';return}
+      paymentCompleting=true;complete.disabled=true;complete.textContent='正在完成下單…';
       const hasPreorder=orderedItems.some(({product})=>product.preorder),itemDetails=orderedItems.map(({item,product})=>`<article class="success-order-item"><div class="success-order-image image-loading">${productImageMarkup(product,0,'')}</div><div><small>${product.id} · 925 SILVER</small>${product.preorder?'<span class="order-item-status">預訂商品</span>':''}<h2>${product.name}</h2><p>${item.size?`尺寸：${item.size} · `:''}數量：${item.qty}</p></div><strong>${money(productPrice(product)*item.qty)}</strong></article>`).join('');
       releaseProofPreview();$('#app').innerHTML=`<section class="shop-head checkout-success"><nav class="checkout-progress" aria-label="結帳進度"><span class="done"><i>1</i>購物清單</span><span class="done"><i>2</i>確認及付款</span><span class="active" aria-current="step"><i>3</i>下單成功</span></nav><div class="success-heading"><p class="eyebrow">ORDER CREATED · DEMO</p><h1>下單成功</h1><p class="success-order-number">訂單編號：<strong>${order}</strong></p></div><div class="success-order-details"><p class="eyebrow">ORDER DETAILS · 訂購商品詳情</p>${hasPreorder?'<p class="preorder-order-note">訂單包含預訂商品，預設待商品齊全後一併寄出。</p>':''}${itemDetails}<div class="success-order-total"><span>訂單總額</span><strong>${total}</strong></div><p class="success-thanks">謝謝你的購買，我們會盡快確認訂單</p></div><div class="demo-notice">付款憑證已上傳。正式版本會在後台建立待確認訂單，並自動寄出確認 Email。</div><a class="primary" href="#order">查詢訂單流程 →</a></section>`;
-      bindProductImages($('#app'));cart=[];saveCart();window.scrollTo(0,0)
+      bindProductImages($('#app'));localStorage.removeItem(checkoutDraftKey);cart=[];saveCart();window.scrollTo(0,0)
     };
     window.scrollTo(0,0)
   }
