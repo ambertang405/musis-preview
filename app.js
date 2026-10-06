@@ -150,11 +150,11 @@ function renderCheckout(){
       $('#pickupLabel').innerHTML='收件地址 <em class="required-mark">*</em>';$('#pickupInput').placeholder='請輸入完整地址。';$('#pickupHelp').textContent='';
       $('#reviewShipping').textContent=free?'免運 · 順豐寄付':'順豐到付';$('#reviewTotal').textContent=money(discountedSub);
     }else{
-      const fee=discountedSub>=300?0:25;
+      const free=discountedSub>=300;
       $('#phoneLabel').innerHTML='手機號碼（+853） <em class="required-mark">*</em>';$('#checkoutPhone').placeholder='例如：6688 1234';$('#recipientPhoneLabel').innerHTML='收件人聯繫電話（+853） <em class="required-mark">*</em>';$('#recipientPhone').placeholder='例如：6688 1234';
-      $('#deliveryOptions').innerHTML=`<label class="option-card selected"><input type="radio" name="delivery" value="pickup" checked><span><strong>eBuy 取貨點／智能櫃</strong><small>滿 MOP 300 免運</small></span><b>${fee?money(fee):'免運'}</b></label>`;
+      $('#deliveryOptions').innerHTML=`<label class="option-card selected"><input type="radio" name="delivery" value="pickup" checked><span><strong>eBuy 取貨點／智能櫃</strong><small>${free?'已達 MOP 300 包郵條件':'未滿 MOP 300，運費到付'}</small></span><b>${free?'免運':'到付'}</b></label>`;
       $('#pickupLabel').innerHTML='取貨點名稱 <em class="required-mark">*</em>';$('#pickupInput').placeholder='例如：筷子基 eBuy 取貨點';$('#pickupHelp').innerHTML='請先<a href="https://m.ebuy.mo/pickup/center" target="_blank" rel="noreferrer">查看 eBuy 最新站點</a>，再輸入取貨點名稱。';
-      $('#reviewShipping').textContent=fee?money(fee):'免運';$('#reviewTotal').textContent=money(discountedSub+fee);
+      $('#reviewShipping').textContent=free?'免運':'到付';$('#reviewTotal').textContent=money(discountedSub);
     }
     const retainedDelivery=$$('input[name="delivery"]').find(input=>input.value===currentDelivery);if(retainedDelivery)retainedDelivery.checked=true;$$('#deliveryOptions input').forEach(r=>r.onchange=()=>{selectCards();saveDraft()});selectCards();
   };
