@@ -121,6 +121,7 @@ label{font-size:11px;display:grid;gap:8px}
 input{font:13px var(--sans)}
 label>input:not([type=radio]):not([type=checkbox]){background:transparent;border:0;border-bottom:1px solid var(--line);padding:12px 2px;outline:none}
 .field-help,.field-error{display:block;min-height:15px;font:9px/1.55 var(--mono)}
+.field-grid>label{align-content:start}
 .field-help{color:var(--muted)}
 .field-help a{color:var(--ink);text-underline-offset:3px}
 .field-error{color:var(--danger)}

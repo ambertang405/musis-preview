@@ -152,7 +152,7 @@ function renderCheckout(){
     }else{
       const fee=discountedSub>=300?0:25;
       $('#phoneLabel').innerHTML='手機號碼（+853） <em class="required-mark">*</em>';$('#checkoutPhone').placeholder='例如：6688 1234';
-      $('#deliveryOptions').innerHTML=`<label class="option-card selected"><input type="radio" name="delivery" value="ebuy" checked><span><strong>eBuy 取貨點</strong><small>滿 MOP 300 免運</small></span><b>${fee?money(fee):'免運'}</b></label><label class="option-card"><input type="radio" name="delivery" value="locker"><span><strong>智能櫃</strong><small>澳門地區</small></span><b>${fee?money(fee):'免運'}</b></label>`;
+      $('#deliveryOptions').innerHTML=`<label class="option-card selected"><input type="radio" name="delivery" value="pickup" checked><span><strong>eBuy 取貨點／智能櫃</strong><small>滿 MOP 300 免運</small></span><b>${fee?money(fee):'免運'}</b></label>`;
       $('#pickupLabel').innerHTML='取貨點名稱 <em class="required-mark">*</em>';$('#pickupInput').placeholder='例如：筷子基 eBuy 取貨點';$('#pickupHelp').innerHTML='請先<a href="https://m.ebuy.mo/pickup/center" target="_blank" rel="noreferrer">查看 eBuy 最新站點</a>，再輸入取貨點名稱。';
       $('#reviewShipping').textContent=fee?money(fee):'免運';$('#reviewTotal').textContent=money(discountedSub+fee);
     }
