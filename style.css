@@ -706,7 +706,7 @@ footer a:hover::after,footer a:active::after,footer a:focus-visible::after{trans
 
 .same-name input:checked::before{transform:rotate(-45deg) scale(1)}
 
-#recipientName[readonly]{color:var(--muted)}
+#recipientName[readonly],#recipientPhone[readonly]{color:var(--muted)}
 
 @media(max-width:560px){.recipient-row{grid-template-columns:1fr}
 .same-name{padding-bottom:0}
