@@ -709,8 +709,8 @@ footer a:hover::after,footer a:active::after,footer a:focus-visible::after{trans
 
 #recipientName[readonly],#recipientPhone[readonly]{color:var(--muted)}
 
-@media(max-width:560px){.recipient-row{grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:end}
-.same-name{padding-bottom:12px;font-size:11px}
+@media(max-width:560px){.recipient-row{grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start}
+.same-name{padding:2px 0 0;font-size:11px}
 }
 
 .terms>input[type="checkbox"]{appearance:none;-webkit-appearance:none;width:17px;height:17px;margin:0;border:1px solid var(--muted);display:grid;place-items:center;flex:0 0 17px;cursor:pointer}
